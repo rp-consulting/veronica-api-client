@@ -1,0 +1,83 @@
+{
+  "id":"comprobante",
+  "version":"1.0.0",
+  "infoTributaria":{
+    "ruc":"9999999999999",
+    "razonSocial":"Suministros Nacionales S.A.",
+    "estab":"001",
+    "ptoEmi":"001",
+    "ambiente":1,
+    "nombreComercial":"Empresa Importadora y Exportadora de Piezas",
+    "codDoc":"04",
+    "tipoEmision":1,
+    "secuencial":"000021691",
+    "dirMatriz":"Enrique Guerrero Portilla OE1-34 AV. Galo Plaza Lasso"
+  },
+  "infoNotaCredito":{
+    "motivo":"mal facturado",
+    "identificacionComprador":"9999999999",
+    "razonSocialComprador":"PRUEBAS SERVICIO DE RENTAS INTERNAS",
+    "contribuyenteEspecial":393,
+    "obligadoContabilidad":"SI",
+    "fechaEmision":"22/07/2020",
+    "dirEstablecimiento":"salinas y santiago",
+    "valorModificacion":40.22,
+    "codDocModificado":"01",
+    "tipoIdentificacionComprador":"05",
+    "numDocModificado":"001-001-000170947",
+    "moneda":"DOLAR",
+    "fechaEmisionDocSustento":"13/11/2019",
+    "totalSinImpuestos":35.91,
+    "totalImpuesto":[
+      {
+        "codigoPorcentaje":2,
+        "codigo":2,
+        "valor":4.31,
+        "baseImponible":35.91
+      }
+    ]
+  },
+  "detalle":[
+    {
+      "descripcion":"RON SAN MIGUEL  GOLD  750 ML",
+      "precioUnitario":6.44,
+      "codigoInterno":"190P",
+      "precioTotalSinImpuesto":35.91,
+      "codigoAdicional":"U",
+      "descuento":2.7,
+      "impuesto":[
+        {
+          "codigoPorcentaje":2,
+          "tarifa":12,
+          "codigo":2,
+          "valor":4.31,
+          "baseImponible":35.91
+        }
+      ],
+      "detAdicional":[
+        {
+          "nombre":"Marca Chevrolet",
+          "valor":"Chevrolet"
+        },
+        {
+          "nombre":"Modelo",
+          "valor":"2012"
+        },
+        {
+          "nombre":"Chasis",
+          "valor":"8LDETA03V20003289"
+        }
+      ]
+    }
+  ],
+  "campoAdicional":[
+    {
+      "nombre":"email",
+      "value":"rolando.roc@gmail.com;info@rolandopalermo.com"
+    },
+    {
+      "nombre":"referencia",
+      "value":"Isidro Ayora y Pacifico Proano Licoreria El Sambo"
+    }
+  ]
+}

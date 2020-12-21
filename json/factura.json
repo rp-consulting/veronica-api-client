@@ -1,0 +1,98 @@
+{
+  "id":"comprobante",
+  "version":"1.1.0",
+  "infoTributaria":{
+    "ambiente":"1",
+    "tipoEmision":"1",
+    "razonSocial":"Suministros Nacionales S.A.",
+    "nombreComercial":"Empresa Importadora y Exportadora de Piezas",
+    "ruc":"1091701991001",
+    "codDoc":"01",
+    "estab":"001",
+    "ptoEmi":"001",
+    "secuencial":"000000532",
+    "dirMatriz":"Enrique Guerrero Portilla OE1-34 AV. Galo Plaza Lasso"
+  },
+  "infoFactura":{
+    "fechaEmision":"26/09/2020",
+    "dirEstablecimiento":"Sebastián Moreno S/N Francisco García",
+    "contribuyenteEspecial":"5368",
+    "obligadoContabilidad":"SI",
+    "tipoIdentificacionComprador":"04",
+    "guiaRemision":"001-001-000000001",
+    "razonSocialComprador":"PRUEBAS SERVICIO DE RENTAS INTERNAS",
+    "identificacionComprador":"1713328506001",
+    "direccionComprador":"salinas y santiago",
+    "totalSinImpuestos":19.00,
+    "totalDescuento":0.00,
+    "totalImpuesto":[
+      {
+        "codigo":"2",
+        "codigoPorcentaje":"2",
+        "baseImponible":19.00,
+        "valor":2.28
+      }
+    ],
+    "propina":0,
+    "importeTotal":21.28,
+    "moneda":"DOLAR",
+    "pagos":[
+      {
+        "formaPago":"20",
+        "total":21.28,
+        "plazo":"0",
+        "unidadTiempo":"dias"
+      }
+    ],
+    "valorRetIva":0.00,
+    "valorRetRenta":0.00
+  },
+  "detalle":[
+    {
+      "codigoPrincipal":"125BJC-01",
+      "codigoAuxiliar":"1234D56789-A",
+      "descripcion":"CAMIONETA 4X4 DIESEL 3.7",
+      "cantidad":1.0,
+      "precioUnitario":19.00,
+      "descuento":0.00,
+      "precioTotalSinImpuesto":19.00,
+      "detAdicional":[
+        {
+          "nombre":"Marca Chevrolet",
+          "valor":"Chevrolet"
+        },
+        {
+          "nombre":"Modelo",
+          "valor":"2012"
+        },
+        {
+          "nombre":"Chasis",
+          "valor":"8LDETA03V20003289"
+        }
+      ],
+      "impuesto":[
+        {
+          "codigo":"2",
+          "codigoPorcentaje":"2",
+          "tarifa":12,
+          "baseImponible":19.00,
+          "valor":2.28
+        }
+      ]
+    }
+  ],
+  "campoAdicional":[
+    {
+      "nombre":"Codigo Impuesto ISD",
+      "value":"4580"
+    },
+    {
+      "nombre":"Impuesto ISD",
+      "value":"15.42x"
+    },
+    {
+      "nombre":"emailCliente",
+      "value":"rolando.roc@gmail.com"
+    }
+  ]
+}
