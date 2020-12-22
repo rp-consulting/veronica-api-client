@@ -2,6 +2,7 @@
 
 ## Sandbox
 - API Documentation
+
 [https://veronica-api-sbox.rolandopalermo.com/swagger-ui.html](https://veronica-api-sbox.rolandopalermo.com/swagger-ui.html)
 
 - API Authentication
