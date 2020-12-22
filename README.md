@@ -1,12 +1,12 @@
-# Veronica Rest API client examples
+# Ejemplos de consumo de la API de Veronica
 
-## Sandbox
+## Ambiente de Sandbox
 
-### API Documentation
+### Documentación
 
 [https://veronica-api-sbox.rolandopalermo.com/swagger-ui.html](https://veronica-api-sbox.rolandopalermo.com/swagger-ui.html)
 
-### API Authentication
+### Obtención de token
 
 | Attribute          | Value                 |
 |--------------------|-----------------------|
@@ -20,3 +20,6 @@ curl --location --request POST 'https://veronica-api-sbox.rolandopalermo.com/api
 --header 'Authorization: Basic ${client_credentials}' \
 --data-raw ''
 ```
+
+### Videotutoriales
+- [Carga de certificados digitales y creación de plantillas](https://www.youtube.com/watch?v=3nSb7Lr15Z8&t=15s)
