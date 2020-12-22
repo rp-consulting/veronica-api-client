@@ -1,5 +1,5 @@
 # Ejemplos de consumo de la API de Veronica
-
+En este proyecto encontrarás ejemplos de implementaciones con las tecnologías más populares del mercado para el consumo y utilización de la API REST de Verónica para la emisión de comprobantes electrónicos en Ecuador.
 ## Ambiente de Sandbox
 
 ### Documentación
