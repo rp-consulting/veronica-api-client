@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "veronica.base-url",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "veronica.api.client-id",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "veronica.api.client-secret",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "veronica.api.username",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "veronica.api.password",
+      "type": "java.lang.String"
+    }
+  ]
+}

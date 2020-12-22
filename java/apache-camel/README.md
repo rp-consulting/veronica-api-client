@@ -1,0 +1,1 @@
+# Ejemplos de consumo de la API de Veronica con Apache Camel
