@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="_DdZocL47EeOQo_IRkjDF6w" targetNamespace="http://camunda.org/schema/1.0/bpmn" exporter="Camunda Modeler" exporterVersion="4.1.1" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="proceso-emitir-comprobante" name="distarias-send-invoice-process" isExecutable="true" camunda:historyTimeToLive="1">
+    <bpmn2:startEvent id="EventoInicio" name="Inicio">
+      <bpmn2:outgoing>SequenceFlow_1jol3ga</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:endEvent id="EventoFinalizacion" name="Fin">
+      <bpmn2:incoming>SequenceFlow_132eqf4</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:callActivity id="Actividad_CreacionComprobante" name="Crear comprobante" calledElement="proceso-llamar-restful">
+      <bpmn2:extensionElements>
+        <camunda:in sourceExpression="${&#34;api/v1.0/comprobantes&#34;}" target="httpUri" />
+        <camunda:in sourceExpression="${&#34;POST&#34;}" target="httpMethod" />
+        <camunda:in source="jsonRequest" target="payload" />
+        <camunda:out source="httpResponse" target="httpResponse" />
+        <camunda:out source="httpStatusCode" target="httpStatusCode" />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_0lmvd5c</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_06qvqmm</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="SequenceFlow_06qvqmm" sourceRef="Actividad_CreacionComprobante" targetRef="Condicional_CreadoCorrectamente" />
+    <bpmn2:exclusiveGateway id="Condicional_CreadoCorrectamente" name="¿Creado?" default="SequenceFlow_012mwki">
+      <bpmn2:incoming>SequenceFlow_06qvqmm</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1cdjt1z</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_012mwki</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_1cdjt1z" name="Sí" sourceRef="Condicional_CreadoCorrectamente" targetRef="Actividad_ValidacionComprobante">
+      <bpmn2:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#34;access_key&#34;, JSON(httpResponse).jsonPath(&#34;$.result.claveAcceso&#34;).stringValue())}" event="take" />
+      </bpmn2:extensionElements>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${httpStatusCode == 201 &amp;&amp; JSON(httpResponse).hasProp("result")}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_1bctehq" sourceRef="Actividad_ValidacionComprobante" targetRef="Condicional_EnviadoCorrectamente" />
+    <bpmn2:callActivity id="Actividad_ValidacionComprobante" name="Enviar comprobante electrónico" calledElement="proceso-llamar-restful">
+      <bpmn2:extensionElements>
+        <camunda:in sourceExpression="${&#34;api/v1.0/comprobantes/&#34;}${access_key}${&#34;/enviar&#34;}" target="httpUri" />
+        <camunda:in sourceExpression="${&#34;PUT&#34;}" target="httpMethod" />
+        <camunda:in sourceExpression="${&#34;{}&#34;}" target="payload" />
+        <camunda:out source="httpResponse" target="httpResponse" />
+        <camunda:out source="httpStatusCode" target="httpStatusCode" />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_1cdjt1z</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1bctehq</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:exclusiveGateway id="Condicional_EnviadoCorrectamente" name="¿Enviado?" default="SequenceFlow_0vu5h7g">
+      <bpmn2:incoming>SequenceFlow_1bctehq</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_14vxmrt</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_0vu5h7g</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_14vxmrt" name="Sí" sourceRef="Condicional_EnviadoCorrectamente" targetRef="Actividad_AutorizacionComprobante">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${httpStatusCode == 200 &amp;&amp; JSON(httpResponse).jsonPath("$.result.estado").stringValue()=="RECIBIDA"}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:callActivity id="Actividad_AutorizacionComprobante" name="Autorizar comprobante electrónico" calledElement="proceso-llamar-restful">
+      <bpmn2:extensionElements>
+        <camunda:in sourceExpression="${&#34;api/v1.0/comprobantes/&#34;}${access_key}${&#34;/autorizar&#34;}" target="httpUri" />
+        <camunda:in sourceExpression="${&#34;PUT&#34;}" target="httpMethod" />
+        <camunda:in sourceExpression="${&#34;{}&#34;}" target="payload" />
+        <camunda:out source="httpResponse" target="httpResponse" />
+        <camunda:out source="httpStatusCode" target="httpStatusCode" />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_14vxmrt</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_14pkr6j</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="SequenceFlow_14pkr6j" sourceRef="Actividad_AutorizacionComprobante" targetRef="Condicional_AutorizadoCorrectamente" />
+    <bpmn2:exclusiveGateway id="Condicional_Notificacion" name="¿Notificar?" default="SequenceFlow_1oy60py">
+      <bpmn2:incoming>SequenceFlow_0fy2lfj</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_0hcpx1k</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_1oy60py</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_0hcpx1k" name="Sí" sourceRef="Condicional_Notificacion" targetRef="Actividad_NotificacionComprobante">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${JSON(input).prop("notificar").boolValue()}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_1ud0zq4" sourceRef="Actividad_NotificacionComprobante" targetRef="Tarea_RetornoRespuestaFinal" />
+    <bpmn2:callActivity id="Actividad_NotificacionComprobante" name="Notificar comprobante electrónico" calledElement="proceso-llamar-restful">
+      <bpmn2:extensionElements>
+        <camunda:in sourceExpression="${&#34;api/v1.0/comprobantes/&#34;}${access_key}${&#34;/notificar&#34;}" target="httpUri" />
+        <camunda:in sourceExpression="${&#34;POST&#34;}" target="httpMethod" />
+        <camunda:in sourceExpression="${&#34;{}&#34;}" target="payload" />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_0hcpx1k</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1ud0zq4</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="SequenceFlow_1oy60py" name="No" sourceRef="Condicional_Notificacion" targetRef="Tarea_RetornoRespuestaFinal" />
+    <bpmn2:sequenceFlow id="SequenceFlow_132eqf4" sourceRef="Tarea_RetornoRespuestaFinal" targetRef="EventoFinalizacion" />
+    <bpmn2:serviceTask id="Tarea_RetornoRespuestaFinal" name="Retornar respuesta de autorización" camunda:expression="${&#34;true&#34;}">
+      <bpmn2:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="output">${httpResponse}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_1oy60py</bpmn2:incoming>
+      <bpmn2:incoming>SequenceFlow_1ud0zq4</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_132eqf4</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_012mwki" name="No" sourceRef="Condicional_CreadoCorrectamente" targetRef="EventoPropagacionException" />
+    <bpmn2:endEvent id="EventoPropagacionException" name="Retornar error">
+      <bpmn2:incoming>SequenceFlow_012mwki</bpmn2:incoming>
+      <bpmn2:errorEventDefinition errorRef="Error_036f9pj" />
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_0vu5h7g" name="No" sourceRef="Condicional_EnviadoCorrectamente" targetRef="EventoPropagacionException2" />
+    <bpmn2:endEvent id="EventoPropagacionException2" name="Retornar error">
+      <bpmn2:incoming>SequenceFlow_0vu5h7g</bpmn2:incoming>
+      <bpmn2:errorEventDefinition errorRef="Error_036f9pj" />
+    </bpmn2:endEvent>
+    <bpmn2:exclusiveGateway id="Condicional_AutorizadoCorrectamente" name="¿Autorizado?" default="SequenceFlow_1fmoaay">
+      <bpmn2:incoming>SequenceFlow_14pkr6j</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_0fy2lfj</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_1fmoaay</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_0fy2lfj" name="Sí" sourceRef="Condicional_AutorizadoCorrectamente" targetRef="Condicional_Notificacion">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${httpStatusCode == 200 &amp;&amp; JSON(httpResponse).jsonPath("$.result.autorizaciones[0].estado").stringValue()=="AUTORIZADO"}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_1fmoaay" name="No" sourceRef="Condicional_AutorizadoCorrectamente" targetRef="EventoPropagacionException3" />
+    <bpmn2:endEvent id="EventoPropagacionException3" name="Retornar error">
+      <bpmn2:incoming>SequenceFlow_1fmoaay</bpmn2:incoming>
+      <bpmn2:errorEventDefinition errorRef="Error_036f9pj" />
+    </bpmn2:endEvent>
+    <bpmn2:subProcess id="SubProcess_1i34re8" triggeredByEvent="true">
+      <bpmn2:endEvent id="EventoFinalizacionControlErrores">
+        <bpmn2:incoming>SequenceFlow_02sgkga</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:serviceTask id="Tarea_ControlErrores" name="Controlar excepción" camunda:expression="${execution.setVariable(&#34;error&#34;, &#34;NO SE PUDO RECUPERAR LA INFORMACIÓN&#34;)}">
+        <bpmn2:incoming>SequenceFlow_1l4hhzs</bpmn2:incoming>
+        <bpmn2:outgoing>SequenceFlow_02sgkga</bpmn2:outgoing>
+      </bpmn2:serviceTask>
+      <bpmn2:startEvent id="EventoInicioControlErrores">
+        <bpmn2:outgoing>SequenceFlow_1l4hhzs</bpmn2:outgoing>
+        <bpmn2:errorEventDefinition id="ErrorEventDefinition_096rnqx" errorRef="Error_036f9pj" />
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="SequenceFlow_1l4hhzs" sourceRef="EventoInicioControlErrores" targetRef="Tarea_ControlErrores" />
+      <bpmn2:sequenceFlow id="SequenceFlow_02sgkga" sourceRef="Tarea_ControlErrores" targetRef="EventoFinalizacionControlErrores" />
+    </bpmn2:subProcess>
+    <bpmn2:sequenceFlow id="SequenceFlow_1jol3ga" sourceRef="EventoInicio" targetRef="Tarea_ConstruccionJson">
+      <bpmn2:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#34;jsonRequest&#34;, JSON(input).prop(&#34;contenidoXmlCodificadoBase64&#34;).stringValue())}" event="take" />
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="SequenceFlow_0lmvd5c" sourceRef="Tarea_ConstruccionJson" targetRef="Actividad_CreacionComprobante" />
+    <bpmn2:serviceTask id="Tarea_ConstruccionJson" name="Contrutir comprobante como JSON" camunda:delegateExpression="#{jsonBuilderAdapter}">
+      <bpmn2:incoming>SequenceFlow_1jol3ga</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_0lmvd5c</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+  </bpmn2:process>
+  <bpmn2:error id="Error_036f9pj" name="Error_UNEXPECTED_STATUS_CODE" errorCode="UNEXPECTED_STATUS_CODE" />
+  <bpmn2:error id="Error_1pmidrs" name="Error_1blk37t" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proceso-emitir-comprobante">
+      <bpmndi:BPMNEdge id="SequenceFlow_0lmvd5c_di" bpmnElement="SequenceFlow_0lmvd5c">
+        <di:waypoint x="350" y="130" />
+        <di:waypoint x="390" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1jol3ga_di" bpmnElement="SequenceFlow_1jol3ga">
+        <di:waypoint x="218" y="130" />
+        <di:waypoint x="250" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1fmoaay_di" bpmnElement="SequenceFlow_1fmoaay">
+        <di:waypoint x="980" y="365" />
+        <di:waypoint x="980" y="422" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="988" y="369" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0fy2lfj_di" bpmnElement="SequenceFlow_0fy2lfj">
+        <di:waypoint x="1005" y="340" />
+        <di:waypoint x="1050" y="340" />
+        <di:waypoint x="1050" y="475" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1044" y="323" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0vu5h7g_di" bpmnElement="SequenceFlow_0vu5h7g">
+        <di:waypoint x="740" y="365" />
+        <di:waypoint x="740" y="422" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="748" y="373" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_012mwki_di" bpmnElement="SequenceFlow_012mwki">
+        <di:waypoint x="550" y="155" />
+        <di:waypoint x="550" y="212" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="558" y="163" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_132eqf4_di" bpmnElement="SequenceFlow_132eqf4">
+        <di:waypoint x="1220" y="500" />
+        <di:waypoint x="1272" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1oy60py_di" bpmnElement="SequenceFlow_1oy60py">
+        <di:waypoint x="1075" y="500" />
+        <di:waypoint x="1120" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1089" y="483" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ud0zq4_di" bpmnElement="SequenceFlow_1ud0zq4">
+        <di:waypoint x="1170" y="580" />
+        <di:waypoint x="1170" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0hcpx1k_di" bpmnElement="SequenceFlow_0hcpx1k">
+        <di:waypoint x="1050" y="525" />
+        <di:waypoint x="1050" y="620" />
+        <di:waypoint x="1120" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1085" y="603" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_14pkr6j_di" bpmnElement="SequenceFlow_14pkr6j">
+        <di:waypoint x="910" y="340" />
+        <di:waypoint x="955" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_14vxmrt_di" bpmnElement="SequenceFlow_14vxmrt">
+        <di:waypoint x="765" y="340" />
+        <di:waypoint x="810" y="340" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="776" y="323" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1bctehq_di" bpmnElement="SequenceFlow_1bctehq">
+        <di:waypoint x="680" y="340" />
+        <di:waypoint x="715" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cdjt1z_di" bpmnElement="SequenceFlow_1cdjt1z">
+        <di:waypoint x="575" y="130" />
+        <di:waypoint x="630" y="130" />
+        <di:waypoint x="630" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="624" y="113" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_06qvqmm_di" bpmnElement="SequenceFlow_06qvqmm">
+        <di:waypoint x="490" y="130" />
+        <di:waypoint x="525" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_3" bpmnElement="EventoInicio">
+        <dc:Bounds x="182" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="187" y="163" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_3" bpmnElement="EventoFinalizacion">
+        <dc:Bounds x="1272" y="482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1282" y="533" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1wbqv9n_di" bpmnElement="Actividad_CreacionComprobante">
+        <dc:Bounds x="390" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1d07g31_di" bpmnElement="Condicional_CreadoCorrectamente" isMarkerVisible="true">
+        <dc:Bounds x="525" y="105" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="525" y="83" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1bznc4n_di" bpmnElement="Actividad_ValidacionComprobante">
+        <dc:Bounds x="580" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1w6llfv_di" bpmnElement="Condicional_EnviadoCorrectamente" isMarkerVisible="true">
+        <dc:Bounds x="715" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="713" y="293" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_0tfsh96_di" bpmnElement="Actividad_AutorizacionComprobante">
+        <dc:Bounds x="810" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0o7gm7h_di" bpmnElement="Condicional_Notificacion" isMarkerVisible="true">
+        <dc:Bounds x="1025" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="961" y="493" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CallActivity_1sr88n3_di" bpmnElement="Actividad_NotificacionComprobante">
+        <dc:Bounds x="1120" y="580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1m2c64n_di" bpmnElement="Tarea_RetornoRespuestaFinal">
+        <dc:Bounds x="1120" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_19l4ctu_di" bpmnElement="EventoPropagacionException">
+        <dc:Bounds x="532" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="516" y="255" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0yll4ql_di" bpmnElement="EventoPropagacionException2">
+        <dc:Bounds x="722" y="422" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="706" y="465" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1aboew7_di" bpmnElement="Condicional_AutorizadoCorrectamente" isMarkerVisible="true">
+        <dc:Bounds x="955" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="947" y="293" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_13tq709_di" bpmnElement="EventoPropagacionException3">
+        <dc:Bounds x="962" y="422" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="946" y="465" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0q2awps_di" bpmnElement="Tarea_ConstruccionJson">
+        <dc:Bounds x="250" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1i34re8_di" bpmnElement="SubProcess_1i34re8" isExpanded="true">
+        <dc:Bounds x="160" y="270" width="270" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02sgkga_di" bpmnElement="SequenceFlow_02sgkga">
+        <di:waypoint x="350" y="340" />
+        <di:waypoint x="372" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1l4hhzs_di" bpmnElement="SequenceFlow_1l4hhzs">
+        <di:waypoint x="218" y="340" />
+        <di:waypoint x="250" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_12woejv_di" bpmnElement="Tarea_ControlErrores">
+        <dc:Bounds x="250" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1ftzlhh_di" bpmnElement="EventoInicioControlErrores">
+        <dc:Bounds x="182" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1df2lxs_di" bpmnElement="EventoFinalizacionControlErrores">
+        <dc:Bounds x="372" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
