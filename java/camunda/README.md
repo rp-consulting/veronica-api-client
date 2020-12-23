@@ -1,4 +1,4 @@
-# Ejemplos de consumo de la API de Veronica con Camunda
+# Ejemplos de consumo de la API de Veronica con Camunda BPMN
 En este ejemplo se integra el uso de Camunda BPMN para cubrir todo el proceso de emisión de un comprobante, cargando el XML a Verónica API, envíandolo al SRI, autorizando la clave de acceso y finalmente notificando a los clientes mediante un correo electrónico.
 ```bash
 mvn spring-boot:run
