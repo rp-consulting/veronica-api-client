@@ -15,10 +15,10 @@ POST: http://localhost:8080/api/comprobantes/
 ## Procesos Camunda
 Este proceso se utiliza para realizar un llamado a un servicio RESTful.
 <p align="center">
-<img src="https://raw.githubusercontent.com/rp-consulting/veronica-api-client/tree/main/java/camunda/main/static/proceso-llamar-restful.jpeg" width="500">
+<img src="https://raw.githubusercontent.com/rp-consulting/veronica-api-client/main/java/camunda/static/proceso-llamar-restful.jpeg" width="500">
 </p>
 
 El proceso proceso-emitir-comprobante permite cubrir todo el flujo de emisión de un comprobante electrónico en Ecuador.
 <p align="center">
-<img src="https://raw.githubusercontent.com/rp-consulting/veronica-api-client/tree/main/java/camunda/main/static/proceso-emitir-comprobante.jpeg" width="500">
+<img src="https://raw.githubusercontent.com/rp-consulting/veronica-api-client/main/java/camunda/static/proceso-emitir-comprobante.jpeg" width="500">
 </p>
