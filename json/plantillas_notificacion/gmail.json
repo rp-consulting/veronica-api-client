@@ -1,5 +1,5 @@
 {
-  "defaultAccount": true,
+  "cuentaPorDefecto": true,
   "email": "notificaciones@gmail.com",
   "password": "**********",
   "proveedor": "GMAIL",
