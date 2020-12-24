@@ -4,7 +4,6 @@
   "password": "*********",
   "plantillaHTML": "<table border=0 cellspacing=0 style='width:642px;'> <tr> <td> <p> <font size='3'>Su comprobante electr&oacute;nico se ha generado de manera exitosa y se encuentra adjunto al presente correo.</font> </p> </td> </tr> <tr> <td><img src=\"cid:image_top\"></td> </tr> </table>",
   "plantillaPorDefecto": true,
-  "proveedor": "GMAIL",
   "smtpAuth": true,
   "smtpHost": "smtp.gmail.com",
   "smtpPort": 587,
