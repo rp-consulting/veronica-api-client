@@ -3,7 +3,7 @@
   "email": "notificaciones@gmail.com",
   "password": "**********",
   "proveedor": "GMAIL",
-  "smtStartTlsEnable": true,
+  "smtpStartTlsEnable": true,
   "smtpAuth": true,
   "smtpHost": "smtp.gmail.com",
   "smtpPort": 587,
