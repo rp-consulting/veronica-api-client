@@ -6,7 +6,8 @@
 package ec.veronica.cliente;
 
 import ec.veronica.cliente.service.Login;
-import ec.veronica.cliente.service.SriService;
+import ec.veronica.cliente.service.SriServiceJson;
+ 
 import java.awt.Color;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -21,14 +22,16 @@ import javax.swing.JPanel;
 public class Home extends javax.swing.JFrame {
 
     public Login login;
-    public SriService sriService;
+    private SriServiceJson sriService;
     public boolean estadoCreado = false;
     public boolean estadoEnviado = false;
     public boolean  estadoAutorizado = false ;
+    public boolean estadoJson = true;
+    public boolean  estadoXML = false ;
     public Home() {
     try {
         this.login = new Login();
-        this.sriService = new SriService();
+        this.sriService = new SriServiceJson();
         initComponents();
         jBenviar.enable(false);
         jBautorizar.enable(false);
@@ -78,9 +81,9 @@ public class Home extends javax.swing.JFrame {
         jBenviar = new java.awt.Button();
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
+        jTextTipo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextJson = new javax.swing.JTextArea();
+        jTextFactura = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -370,13 +373,13 @@ public class Home extends javax.swing.JFrame {
 
         jPanel7.setBackground(new java.awt.Color(242, 247, 247));
 
-        jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel14.setText("Tu archivo  Json");
+        jTextTipo.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        jTextTipo.setForeground(new java.awt.Color(102, 102, 102));
+        jTextTipo.setText("Pega tu archivo  Json");
 
-        jTextJson.setColumns(20);
-        jTextJson.setRows(5);
-        jScrollPane1.setViewportView(jTextJson);
+        jTextFactura.setColumns(20);
+        jTextFactura.setRows(5);
+        jScrollPane1.setViewportView(jTextFactura);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -384,7 +387,7 @@ public class Home extends javax.swing.JFrame {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel14)
+                .addComponent(jTextTipo)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
@@ -394,7 +397,7 @@ public class Home extends javax.swing.JFrame {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
                 .addContainerGap())
@@ -427,6 +430,9 @@ public class Home extends javax.swing.JFrame {
         setColor(btn_1); 
         ind_1.setOpaque(true);
         resetColor(new JPanel[]{btn_3}, new JPanel[]{ind_3});
+        this.estadoJson = true;
+        this.estadoXML = false ;
+        jTextTipo.setText("Pega tu archivo  Json");
     }//GEN-LAST:event_btn_1MousePressed
 
     private void btn_3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_3MousePressed
@@ -434,6 +440,9 @@ public class Home extends javax.swing.JFrame {
          setColor(btn_3); 
         ind_3.setOpaque(true);
         resetColor(new JPanel[]{btn_1}, new JPanel[]{ind_1});
+        this.estadoJson = false;
+        this.estadoXML = true ;
+        jTextTipo.setText("Pega tu archivo  Xml");
     }//GEN-LAST:event_btn_3MousePressed
 
     int xx,xy;
@@ -460,12 +469,18 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_exitMousePressed
 
     private void jBcrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBcrearActionPerformed
-      if(!jTextJson.getText().isEmpty()){
+      if(!jTextFactura.getText().isEmpty()){
         try {
-            this.estadoCreado = this.sriService.crearSRI(jTextJson.getText());
+            if(estadoJson){
+            this.estadoCreado = this.sriService.crearSRI(jTextFactura.getText());
              jBcrear.enable(false);
+            }else {
+              this.estadoCreado = this.sriService.crearSRIXml(jTextFactura.getText());
+             jBcrear.enable(false);
+            }
+            
             if(this.estadoCreado){
-               JOptionPane.showMessageDialog(this, "Felicidades, se habilito la opcion de enviar, con su clave de acceso  "+ SriService.CLAVE_ACCESO, "Existo", WIDTH);
+               JOptionPane.showMessageDialog(this, "Felicidades, se habilito la opcion de enviar, con su clave de acceso  "+ SriServiceJson.CLAVE_ACCESO, "Existo", WIDTH);
                jBenviar.enable(estadoCreado);
                jBcrear.enable(false);
             }else{
@@ -484,17 +499,17 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jBcrearActionPerformed
 
     private void jBenviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBenviarActionPerformed
-        try {
-            this.estadoEnviado = this.sriService.enviarSRI();
-            jBenviar.enable(false);
+        try { 
+              this.estadoEnviado = this.sriService.enviarSRI();
+              jBenviar.enable(false);
             if(this.estadoEnviado){
-               JOptionPane.showMessageDialog(this, "Felicidades, se habilito la opcion de autorizar, con su clave de acceso "+ SriService.CLAVE_ACCESO, "Existo", WIDTH);
+               JOptionPane.showMessageDialog(this, "Felicidades, se habilito la opcion de autorizar, con su clave de acceso "+ SriServiceJson.CLAVE_ACCESO, "Existo", WIDTH);
                jBautorizar.enable(estadoEnviado);
                jBcrear.enable(false);
                jBenviar.enable(false);
             }else{
                jBenviar.enable(true);
-               JOptionPane.showMessageDialog(this, "Verifique el estado del json", "Error", WIDTH);
+               JOptionPane.showMessageDialog(this, "Verifique si el json esta correcto o xml", "Error", WIDTH);
             }
         } catch (IOException ex) {
             Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
@@ -506,17 +521,20 @@ public class Home extends javax.swing.JFrame {
 
     private void jBautorizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBautorizarActionPerformed
         try {
-            this.estadoAutorizado = this.sriService.autorizarSRI();
-            jBautorizar.enable(false);
+            
+           this.estadoAutorizado = this.sriService.autorizarSRI();
+           jBautorizar.enable(false);
+     
             if(this.estadoAutorizado){
-               JOptionPane.showMessageDialog(this, "Felicidades, se autorizo con exito en el SRI, con su clave de "+ SriService.CLAVE_ACCESO, "Existo", WIDTH);
+               JOptionPane.showMessageDialog(this, "Felicidades, se autorizo con exito en el SRI, con su clave de "+ SriServiceJson.CLAVE_ACCESO, "Existo", WIDTH);
                jBautorizar.enable(false);
                jBcrear.enable(estadoAutorizado);
                jBenviar.enable(false);
-               jTextJson.setText("");
+               jTextFactura.setText("");
+               SriServiceJson.CLAVE_ACCESO = "";
             }else{
                 jBautorizar.enable(true);
-               JOptionPane.showMessageDialog(this, "Verifique el estado del json", "Error", WIDTH);
+               JOptionPane.showMessageDialog(this, "Verifique si el json esta correcto o xml", "Error", WIDTH);
             }
         } catch (IOException ex) {
             Logger.getLogger(Home.class.getName()).log(Level.SEVERE, null, ex);
@@ -593,7 +611,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
@@ -609,7 +626,8 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextArea jTextJson;
+    private javax.swing.JTextArea jTextFactura;
+    private javax.swing.JLabel jTextTipo;
     private javax.swing.JPanel side_pane;
     // End of variables declaration//GEN-END:variables
 }

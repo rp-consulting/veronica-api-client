@@ -19,12 +19,32 @@ import java.net.http.HttpResponse;
  *
  * @author Xavi
  */
-public class SriService {
+public class SriServiceJson {
     public static String CLAVE_ACCESO = "";
     private final Gson gson;
 
-    public SriService() {
+    public SriServiceJson() {
         this.gson = new Gson();
+    }
+    
+    public boolean crearSRIXml (String factura) throws IOException, InterruptedException{
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api-dev.veronica.ec/api/v1.0/comprobantes"))
+                .setHeader("Content-type", "application/atom+xml")
+                .setHeader("Authorization", "Bearer "  + Login.TOKEN)
+                .POST(HttpRequest.BodyPublishers.ofString(factura))
+                .build();
+        
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        
+        System.out.println(response.body());
+        Status status  = gson.fromJson(response.body(), Status.class);
+        if (status.getSuccess()){
+            SriServiceJson.CLAVE_ACCESO = status.getResult().getClaveAcceso();
+        }
+      return status.getSuccess() ; 
     }
     
     public boolean crearSRI (String factura) throws IOException, InterruptedException{
